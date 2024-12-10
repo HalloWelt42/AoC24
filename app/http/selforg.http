@@ -1,3 +1,9 @@
-# working test
+# working test: print 'Welcome to Advent of Code 2024'
+# alternativ in bash: curl -k GET https://selforg.mac/aoc24/welcome
 GET https://selforg.mac/aoc24/welcome
+###
+
+# Day 1 testdata
+#GET https://selforg.mac/aoc24/day1/testdata
+
 
