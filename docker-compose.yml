@@ -1,0 +1,12 @@
+---
+version: "3"
+
+services:
+  php-apache:
+    container_name: "${CONTAINER_NAME_PREFIX}-apache-php"
+    build: ./docker/php-apache
+    volumes:
+      - ${PATH_TO_SYMFONY_PROJECT}:/var/www/html
+    ports:
+      - "80:80"
+      - "443:443"  # Neu: Port 443 für HTTPS

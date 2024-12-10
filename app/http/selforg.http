@@ -1,0 +1,3 @@
+# curl http://selforg.mac/aoc/day1/a/test
+# curl http://selforg.mac/aoc/day1/a/live
+GET https://selforg.mac/
