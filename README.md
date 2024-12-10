@@ -24,9 +24,8 @@ composer create-project symfony/skeleton:"6.4.*" ./
 ```
 
 ## Installierte Pakete
-Es laufen drei Container: Apache-PHP, MariaDB und Adminer.
+Es laufen Container: Apache-PHP
 - [Web-App](http://localhost)
-- [Adminer](http://localhost:8080)
 
 ## Domains für die Arbeit unter MacOS
 `sudo nano /etc/hosts`
