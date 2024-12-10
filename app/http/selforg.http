@@ -4,6 +4,12 @@ GET https://selforg.mac/aoc24/welcome
 ###
 
 # Day 1 testdata
-#GET https://selforg.mac/aoc24/day1/testdata
+GET https://selforg.mac/aoc24/day1/a/test
+###
+
+# Day 1 live
+GET https://selforg.mac/aoc24/day1/a/live
+###
+
 
 

@@ -43,6 +43,27 @@ class AocController extends AbstractController
 
         return new Response(PHP_EOL . $result . PHP_EOL);
     }
+
+    #[Route('/day1/b/{name}', name: 'Historian_Hysteria_b',methods: ['GET'])]
+    public function historian_hysteria_b(string $name): Response
+    {
+        // Zahlenpaare aus der Datei lesen
+        [$result_a, $result_b] = $this->historian_hysteria($name);
+        $result = 0;
+        $count = count($result_a);
+        // Zähle die Häufigkeit der Zahlen in $result_b
+        $b = array_count_values($result_b);
+        for ($i = 0; $i < $count; $i++) {
+            $a = $result_a[$i];
+            // Wenn die Zahl in $result_a auch in $result_b vorkommt,
+            // addiere das Produkt zu $result
+            if (key_exists($a, $b)) {
+                $result += $a * ($b[$a]) ?? 0;
+            }
+        }
+        return new Response(PHP_EOL . $result . PHP_EOL);
+    }
+    # helper function
     private function historian_hysteria(string $name): array
     {
         $data = $this->getAllData(1,$name);
@@ -61,7 +82,8 @@ class AocController extends AbstractController
         return [$result_a, $result_b];
     }
 
-    # helper function
+
+
     private function getAllData(int $day,string $name):string
     {
         $filePath = __DIR__ . "/../../data/day{$day}/{$name}.txt";
