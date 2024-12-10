@@ -1,49 +1,68 @@
-FROM php:apache
+FROM php:8.1-apache
 
+# Set Apache Document Root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # Installiere erforderliche Pakete
 RUN apt-get update && apt-get install -y \
     openssl \
+    libicu-dev \
+    libzip-dev \
+    zip \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev \
+    git \
+    autoconf \
+    gcc \
+    make \
+    curl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Aktiviere SSL-Modul in Apache
-RUN a2enmod ssl
+# Apache SSL-Modul und Konfiguration
+RUN a2enmod ssl \
+    && openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/ssl/private/localhost.key \
+        -out /etc/ssl/certs/localhost.crt \
+        -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=localhost"
 
-# Erstelle selbstsigniertes SSL-Zertifikat für localhost
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/localhost.key -out /etc/ssl/certs/localhost.crt -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=localhost"
-
-# Kopiere die Apache-Konfigurationsdatei für SSL
+# Kopiere Apache SSL-Konfiguration
 COPY ./apache_ssl_local.conf /etc/apache2/sites-available/default-ssl.conf
-
-# Aktiviere die neue SSL-Konfiguration
 RUN a2ensite default-ssl
 
-#INI-Files
+# PHP INI-Files
 COPY ./opcache.ini "$PHP_INI_DIR/conf.d/docker-php-ext-opcache.ini"
 COPY ./xdebug.ini "$PHP_INI_DIR/conf.d/99-xdebug.ini"
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
-#Install Packages
-RUN apt-get -y update && apt-get install -y libicu-dev libzip-dev zip libjpeg-dev libpng-dev libfreetype6-dev git
-RUN docker-php-ext-configure intl
-RUN docker-php-ext-configure gd '--with-jpeg' '--with-freetype'
-RUN docker-php-ext-install intl opcache pdo_mysql zip gd
-RUN pecl install xdebug
-RUN a2enmod rewrite
+# PHP Extensions: intl, gd, pdo_mysql, zip
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype \
+    && docker-php-ext-install intl opcache pdo_mysql zip gd
 
-#INSTALL APCU
-RUN pecl install apcu-5.1.22 && docker-php-ext-enable apcu
-RUN echo "extension=apcu.so" > /usr/local/etc/php/php.ini
-RUN echo "apc.enable_cli=1" > /usr/local/etc/php/php.ini
-RUN echo "apc.enable=1" > /usr/local/etc/php/php.ini
-#APCU
+# Xdebug installieren
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
 
-# Install Composer
+# APCu installieren und konfigurieren
+RUN pecl install apcu \
+    && docker-php-ext-enable apcu \
+    && echo "extension=apcu.so" > "$PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini" \
+    && echo "apc.enable_cli=1" >> "$PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini" \
+    && echo "apc.enable=1" >> "$PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini"
+
+# Composer installieren
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN curl -sS https://get.symfony.com/cli/installer | bash && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
-# Install NVM
-RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+# Symfony CLI installieren
+RUN curl -sS https://get.symfony.com/cli/installer | bash \
+    && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+
+# NVM installieren (Node.js Manager)
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+# Apache Rewrite Modul aktivieren
+RUN a2enmod rewrite
