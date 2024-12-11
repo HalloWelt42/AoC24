@@ -3,30 +3,44 @@
 GET https://selforg.mac/aoc24/welcome
 ###
 
-# Day 1 test
+# Day 1 test / my solution 11
 GET https://selforg.mac/aoc24/day1/a/test
 ###
 
-# Day 1 part a
+# Day 1 part a / my solution 3246517
 GET https://selforg.mac/aoc24/day1/a/live
 ###
 
-# day 1 part b
+# day 1 part b / my solution 29379307
 GET https://selforg.mac/aoc24/day1/b/live
 ###
 
 
 
-# Day 2 test
+# Day 2 test / my solution 2
 GET https://selforg.mac/aoc24/day2/a/test
 ###
 
-# Day 2 part a
+# Day 2 part a / my solution 670
 GET https://selforg.mac/aoc24/day2/a/live
 ###
 
-# day 2 part b
+# day 2 part b / my solution 700
 GET https://selforg.mac/aoc24/day2/b/live
+###
+
+
+
+# Day 3 test / my solution 161
+GET https://selforg.mac/aoc24/day3/a/test
+###
+
+# Day 3 part a / my solution 161289189
+GET https://selforg.mac/aoc24/day3/a/live
+###
+
+# day 3 part b / my solution 83595109
+GET https://selforg.mac/aoc24/day3/b/live
 ###
 
 

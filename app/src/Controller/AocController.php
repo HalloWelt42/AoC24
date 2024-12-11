@@ -69,7 +69,7 @@ class AocController extends AbstractController
 
     # day 2
     #[Route('/day2/a/{name}', name: 'Red_Nosed_Reports_a', methods: ['GET'])]
-    public function red_nosed_reports_a(string $name): Response
+    public function redNosedReports_a(string $name): Response
     {
         $result = 0;
         foreach ($this->readDataLine(2, $name) as $line) {
@@ -83,7 +83,7 @@ class AocController extends AbstractController
     }
 
     #[Route('/day2/b/{name}', name: 'Red_Nosed_Reports_b')]
-    public function red_nosed_reports_b(string $name): Response
+    public function redNosedReports_b(string $name): Response
     {
         $result = 0;
         foreach ($this->readDataLine(2, $name) as $line) {
@@ -109,6 +109,49 @@ class AocController extends AbstractController
         }
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
+
+    #[Route('/day3/a/{name}', name: 'mull_it_over_a')]
+    public function mullItOver_a(string $name): Response
+    {
+        $result = 0;
+        $regex = '/mul\(\d{1,3},\d{1,3}\)/';
+        preg_match_all($regex, $this->getAllData(3,$name), $matches);
+        foreach ($matches[0] as $match) {
+            $numbers = explode(',', substr($match, 4, -1));
+            $result += $numbers[0] * $numbers[1];
+        }
+        return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
+    }
+
+    #[Route('/day3/b/{name}', name: 'mull_it_over_b')]
+    public function mullItOver_b(string $name): Response
+    {
+        $result = 0;
+        $regex = '/mul\((\d{1,3}),(\d{1,3})\)|don\'t\(\)|do\(\)/';
+        preg_match_all($regex, $this->getAllData(3,$name), $matches);
+        $calc = true;
+        foreach ($matches[0] as $match) {
+            if (
+                str_contains($match, "don't()")
+                || str_contains($match, 'do()')
+            ) {
+                if (str_contains($match, "don't()")) {
+                    $calc = false;
+                }
+                if (str_contains($match, 'do()')) {
+                    $calc = true;
+                }
+                continue;
+            }
+            if (!$calc) {
+                continue;
+            }
+            $numbers = explode(',', substr($match, 4, -1));
+            $result += $numbers[0] * $numbers[1];
+        }
+        return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
+    }
+
 
 
     # helper function
@@ -137,6 +180,12 @@ class AocController extends AbstractController
         return [$result_a, $result_b];
     }
 
+    /**
+     * Check if the given array is valid
+     *
+     * @param array $vals
+     * @return bool
+     */
     private function redNosedReports_isSave(array $vals): bool
     {
         $isLocked = false;
