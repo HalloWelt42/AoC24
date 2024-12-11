@@ -20,11 +20,11 @@ class AocController extends AbstractController
     }
 
     # day 1
-    #[Route('/day1/a/{name}', name: 'historian_hysteria_a', methods: ['GET'])]
-    public function historianHysteria_a(string $name): Response
+    #[Route('/day1/a/{file_name}', name: 'historian_hysteria_a', methods: ['GET'])]
+    public function historianHysteria_a(string $file_name): Response
     {
         // reads the entire contents of a file and returns two lists of integers
-        [$result_a, $result_b] = $this->historianHysteria_getAB($name);
+        [$result_a, $result_b] = $this->historianHysteria_getAB($file_name);
 
         // find the smallest number a and b, calculate the distance between the two numbers and remove it from the array
         $result = 0;
@@ -48,11 +48,11 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . $result . PHP_EOL);
     }
 
-    #[Route('/day1/b/{name}', name: 'historian_hysteria_b', methods: ['GET'])]
-    public function historianHysteria_b(string $name): Response
+    #[Route('/day1/b/{file_name}', name: 'historian_hysteria_b', methods: ['GET'])]
+    public function historianHysteria_b(string $file_name): Response
     {
         // Read number pairs from the file
-        [$result_a, $result_b] = $this->historianHysteria_getAB($name);
+        [$result_a, $result_b] = $this->historianHysteria_getAB($file_name);
         $result = 0;
         $count = count($result_a);
         // Count the frequency of the numbers in $result_b
@@ -68,11 +68,11 @@ class AocController extends AbstractController
     }
 
     # day 2
-    #[Route('/day2/a/{name}', name: 'Red_Nosed_Reports_a', methods: ['GET'])]
-    public function redNosedReports_a(string $name): Response
+    #[Route('/day2/a/{file_name}', name: 'Red_Nosed_Reports_a', methods: ['GET'])]
+    public function redNosedReports_a(string $file_name): Response
     {
         $result = 0;
-        foreach ($this->readDataLine(2, $name) as $line) {
+        foreach ($this->readDataLine(2, $file_name) as $line) {
             $vals = explode(' ', $line);
             $valid = $this->redNosedReports_isSave($vals);
             if ($valid === true) {
@@ -82,11 +82,11 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
-    #[Route('/day2/b/{name}', name: 'Red_Nosed_Reports_b')]
-    public function redNosedReports_b(string $name): Response
+    #[Route('/day2/b/{file_name}', name: 'Red_Nosed_Reports_b', methods: ['GET'])]
+    public function redNosedReports_b(string $file_name): Response
     {
         $result = 0;
-        foreach ($this->readDataLine(2, $name) as $line) {
+        foreach ($this->readDataLine(2, $file_name) as $line) {
             $vals = explode(' ', $line);
             $valid = $this->redNosedReports_isSave($vals);
             if ($valid === true) {
@@ -110,12 +110,12 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
-    #[Route('/day3/a/{name}', name: 'mull_it_over_a')]
-    public function mullItOver_a(string $name): Response
+    #[Route('/day3/a/{file_name}', name: 'mull_it_over_a', methods: ['GET'])]
+    public function mullItOver_a(string $file_name): Response
     {
         $result = 0;
         $regex = '/mul\(\d{1,3},\d{1,3}\)/';
-        preg_match_all($regex, $this->getAllData(3,$name), $matches);
+        preg_match_all($regex, $this->getAllData(3, $file_name), $matches);
         foreach ($matches[0] as $match) {
             $numbers = explode(',', substr($match, 4, -1));
             $result += $numbers[0] * $numbers[1];
@@ -123,12 +123,12 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
-    #[Route('/day3/b/{name}', name: 'mull_it_over_b')]
-    public function mullItOver_b(string $name): Response
+    #[Route('/day3/b/{file_name}', name: 'mull_it_over_b', methods: ['GET'])]
+    public function mullItOver_b(string $file_name): Response
     {
         $result = 0;
         $regex = '/mul\((\d{1,3}),(\d{1,3})\)|don\'t\(\)|do\(\)/';
-        preg_match_all($regex, $this->getAllData(3,$name), $matches);
+        preg_match_all($regex, $this->getAllData(3, $file_name), $matches);
         $calc = true;
         foreach ($matches[0] as $match) {
             if (
@@ -152,9 +152,81 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
+    #[Route('/day4/a/{file_name}', name: 'ceres_search_a', methods: ['GET'])]
+    public function ceresSearch_a(string $file_name): Response
+    {
+        $m = explode(PHP_EOL, $this->getAllData(4, $file_name));
+        $search = 'XMAS';
+        $result = 0;
+        $line_count = count($m);
 
+        // Define directions (dx, dy)
+        $directions = [
+            [0, 1],   // Horizontal forward
+            [0, -1],  // Horizontal backward
+            [1, 0],   // Vertical downward
+            [-1, 0],  // Vertical upward
+            [1, 1],   // Diagonal forward (bottom-right)
+            [-1, -1], // Diagonal backward (top-left)
+            [1, -1],  // Diagonal forward (bottom-left)
+            [-1, 1],  // Diagonal backward (top-right)
+        ];
+
+        // Iterate over the entire grid
+        for ($y = 0; $y < $line_count; $y++) {
+            for ($x = 0; $x < $line_count; $x++) {
+                foreach ($directions as [$dy, $dx]) {
+                    $matches = function ($y, $x, $dy, $dx) use ($m, $search, $line_count) {
+                        for ($i = 0; $i < strlen($search); $i++) {
+                            $ny = $y + $i * $dy;
+                            $nx = $x + $i * $dx;
+                            if ($ny < 0 || $ny >= $line_count || $nx < 0 || $nx >= $line_count || $m[$ny][$nx] !== $search[$i]) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    };
+
+                    // Check if the pattern matches in the current direction
+                    if ($matches($y, $x, $dy, $dx)) {
+                        $result++;
+                    }
+                }
+            }
+        }
+        return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
+    }
+
+    #[Route('/day4/b/{file_name}', name: 'ceres_search_b', methods: ['GET'])]
+    public function ceresSearch_b(string $file_name): Response
+    {
+        $result = 0;
+        $search = ['MSAMS', 'MMASS', 'SMASM', 'SSAMM'];
+        $data = $this->getAllData(4, $file_name);
+        foreach ($this->ceresSearch($data) as $matrix) {
+            $result += in_array($matrix, $search);
+        }
+        return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
+    }
 
     # helper function
+
+    /**
+     * Search for the string XMAS in the file
+     *
+     * @param string $data content of the file
+     * @return Generator
+     */
+    private function ceresSearch(string $data): Generator
+    {
+        $m = explode(PHP_EOL, $data);
+        $line_count = count($m) - 2;
+        for ($y = 0; $y < $line_count; $y++) {
+            for ($x = 0; $x < $line_count; $x++) {
+                yield $m[$y][$x] . $m[$y][$x + 2] . $m[$y + 1][$x + 1] . $m[$y + 2][$x] . $m[$y + 2][$x + 2];
+            }
+        }
+    }
 
     /**
      * Reads the entire contents of a file and returns two lists of integers

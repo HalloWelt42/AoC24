@@ -45,4 +45,17 @@ GET https://selforg.mac/aoc24/day3/b/live
 
 
 
+# Day 4 test / my solution 18
+GET https://selforg.mac/aoc24/day4/a/test
+###
+
+# Day 4 part a / my solution 2532
+GET https://selforg.mac/aoc24/day4/a/live
+###
+
+# day 4 part b / my solution 1941
+GET https://selforg.mac/aoc24/day4/b/live
+###
+
+
 
