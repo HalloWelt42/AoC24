@@ -109,6 +109,7 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
+    # day 3
     #[Route('/day3/a/{file_name}', name: 'mull_it_over_a', methods: ['GET'])]
     public function mullItOver_a(string $file_name): Response
     {
@@ -151,6 +152,7 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
+    # day 4
     #[Route('/day4/a/{file_name}', name: 'ceres_search_a', methods: ['GET'])]
     public function ceresSearch_a(string $file_name): Response
     {
@@ -208,7 +210,7 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
-
+    # day 5
     #[Route('/day5/a/{file_name}', name: 'print_queue', methods: ['GET'])]
     public function printQueue_a(string $file_name): Response
     {
@@ -216,28 +218,152 @@ class AocController extends AbstractController
         $rules = explode(PHP_EOL, $this->getAllData(5, $file_name));
         $rules = array_map(fn($rule) => explode('|', $rule), $rules);
 
-        $lists = explode(PHP_EOL, $this->getAllData(5, $file_name.'2'));
+        $lists = explode(PHP_EOL, $this->getAllData(5, $file_name . '2'));
         $lists = array_map(fn($list) => explode(',', $list), $lists);
 
         $lists_count = count($lists);
         for ($i = 0; $i < $lists_count; $i++) {
             $list = $lists[$i];
             $list_count = count($list);
-            for ($j = 0; $j < $list_count-1; $j++) {
-                $chk_rule = $this->printQueue_ChkRule($rules, $list[$j], $list[$j+1]);
-                if (!$chk_rule) {
+            for ($j = 0; $j < $list_count - 1; $j++) {
+                $rule_valid = $this->printQueue_ChkRule($rules, $list[$j], $list[$j + 1]);
+                if (!$rule_valid) {
                     break;
                 }
             }
-            if ($chk_rule) {
-                $result += $list[(count($list)/2)];
+            if ($rule_valid) {
+                $result += $list[(count($list) / 2)];
             }
         }
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
 
+//    #[Route('/day5/b/{file_name}', name: 'print_queue_b', methods: ['GET'])]
+//    public function printQueue_b(string $file_name): Response
+//    {
+//        $result = 0;
+//        $rules = explode(PHP_EOL, $this->getAllData(5, $file_name));
+//        $rules = array_map(fn($rule) => explode('|', $rule), $rules);
+//
+//        $lists = explode(PHP_EOL, $this->getAllData(5, $file_name.'2'));
+//        $lists = array_map(fn($list) => explode(',', $list), $lists);
+//
+//        $lists_count = count($lists);
+//
+//        return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
+//    }
+
+
+    # day 6
+    #[Route('/day6/a/{file_name}', name: 'guard_gallivant_a', methods: ['GET'])]
+    public function guardGallivant_a(string $file_name): Response
+    {
+        $result = 0;
+        $data = $this->getAllData(6, $file_name);
+        $data_y = explode(PHP_EOL, $data);
+
+        $out = false;
+        $cursor = ['x' => 0, 'y' => 0]; // define default cursor position
+        $direction = 'UP'; // UP, RIGHT, DOWN, LEFT
+        $border_max = count($data_y) - 1;
+        $border_min = 0;
+
+        // find the starting point
+        foreach ($data_y as $y => $line) {
+            foreach (str_split($line) as $x => $char) {
+                if ($char === '^') {
+                    $cursor = ['x' => $x, 'y' => $y];
+                    break;
+                }
+            }
+            if ($out) {
+                break;
+            }
+        }
+
+        // replace ^ with X
+        $data_y[$cursor['y']][$cursor['x']] = 'X';
+
+        // rules:
+        //      If something is directly in front of you, turn 90 degrees to the right.
+        //      Otherwise, take a step forward.
+        while (true) {
+            // check if char in next step is '#'
+            $char = $this->lookAhead($cursor, $direction, $data_y);
+            if ($char === '#') {
+                // turn 90 degrees to the right
+                $direction = match ($direction) {
+                    'UP' => 'RIGHT',
+                    'RIGHT' => 'DOWN',
+                    'DOWN' => 'LEFT',
+                    'LEFT' => 'UP',
+                };
+            } else {
+                // take a step forward
+                $cursor = $this->moveCursor($cursor, $direction);
+
+                // check if the cursor is on the border of the grid
+                if (($cursor['x'] === $border_max ||
+                        $cursor['x'] === $border_min ||
+                        $cursor['y'] === $border_max ||
+                        $cursor['y'] === $border_min) &&
+                    $data_y[$cursor['y']][$cursor['x']] === '.'
+                ) {
+                    $data_y[$cursor['y']][$cursor['x']] = 'X';
+                    break;
+                }
+
+                // replace . with X
+                $data_y[$cursor['y']][$cursor['x']] = 'X';
+            }
+
+        }
+
+        // count the number of X in the grid
+        foreach ($data_y as $line) {
+            $result += substr_count($line, 'X');
+        }
+
+
+        return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
+    }
+
     # helper function
+
+    /**
+     * Move the cursor in the given direction
+     *
+     * @param array $cursor
+     * @param string $direction
+     * @return array
+     */
+    private function moveCursor(array $cursor, string $direction): array
+    {
+        $one_step = [
+            'UP' => ['x' => 0, 'y' => -1],
+            'RIGHT' => ['x' => 1, 'y' => 0],
+            'DOWN' => ['x' => 0, 'y' => 1],
+            'LEFT' => ['x' => -1, 'y' => 0],
+        ];
+        $cursor['x'] += $one_step[$direction]['x'];
+        $cursor['y'] += $one_step[$direction]['y'];
+        return $cursor;
+    }
+
+    // look at the next step char in the given direction
+    private function lookAhead(array $cursor, string $direction, array $data_y): string
+    {
+        $one_step = [
+            'UP' => ['x' => 0, 'y' => -1],
+            'RIGHT' => ['x' => 1, 'y' => 0],
+            'DOWN' => ['x' => 0, 'y' => 1],
+            'LEFT' => ['x' => -1, 'y' => 0],
+        ];
+        $cursor['x'] += $one_step[$direction]['x'];
+        $cursor['y'] += $one_step[$direction]['y'];
+        return $data_y[$cursor['y']][$cursor['x']];
+    }
 
     /**
      * Check if the given list of numbers is valid
@@ -390,3 +516,4 @@ class AocController extends AbstractController
     }
 
 }
+

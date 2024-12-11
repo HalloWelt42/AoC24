@@ -67,4 +67,17 @@ GET https://selforg.mac/aoc24/day5/a/test
 GET https://selforg.mac/aoc24/day5/a/live
 ###
 
-# day 5 part b / my solution
+# day 5 part b / my solution (unsolved)
+#GET https://selforg.mac/aoc24/day5/b/live
+###
+
+
+
+# Day 6 test / my solution 44
+GET https://selforg.mac/aoc24/day6/a/test
+###
+
+# Day 6 part a / my solution
+GET https://selforg.mac/aoc24/day6/a/live
+###
+
