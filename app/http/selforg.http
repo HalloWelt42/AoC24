@@ -7,15 +7,28 @@ GET https://selforg.mac/aoc24/welcome
 GET https://selforg.mac/aoc24/day1/a/test
 ###
 
-# Day 1 live
+# Day 1 part a
 GET https://selforg.mac/aoc24/day1/a/live
 ###
+
+# day 1 part b
+GET https://selforg.mac/aoc24/day1/b/live
+###
+
+
 
 # Day 2 test
 GET https://selforg.mac/aoc24/day2/a/test
 ###
 
-# Day 2 live
+# Day 2 part a
 GET https://selforg.mac/aoc24/day2/a/live
 ###
+
+# day 2 part b
+GET https://selforg.mac/aoc24/day2/b/live
+###
+
+
+
 
