@@ -11,8 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/aoc24')]
 class AocController extends AbstractController
 {
-    // Welcome to Advent of Code 2024
-    // only for testing purposes
+    // Welcome to Advent of Code 2024 - this first methode is only for testing purposes
     #[Route('/welcome', name: 'welcome', methods: ['GET'])]
     public function index(): Response
     {
@@ -209,7 +208,56 @@ class AocController extends AbstractController
         return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
     }
 
+
+    #[Route('/day5/a/{file_name}', name: 'print_queue', methods: ['GET'])]
+    public function printQueue_a(string $file_name): Response
+    {
+        $result = 0;
+        $rules = explode(PHP_EOL, $this->getAllData(5, $file_name));
+        $rules = array_map(fn($rule) => explode('|', $rule), $rules);
+
+        $lists = explode(PHP_EOL, $this->getAllData(5, $file_name.'2'));
+        $lists = array_map(fn($list) => explode(',', $list), $lists);
+
+        $lists_count = count($lists);
+        for ($i = 0; $i < $lists_count; $i++) {
+            $list = $lists[$i];
+            $list_count = count($list);
+            for ($j = 0; $j < $list_count-1; $j++) {
+                $chk_rule = $this->printQueue_ChkRule($rules, $list[$j], $list[$j+1]);
+                if (!$chk_rule) {
+                    break;
+                }
+            }
+            if ($chk_rule) {
+                $result += $list[(count($list)/2)];
+            }
+        }
+        return new Response(PHP_EOL . print_r($result, true) . PHP_EOL);
+    }
+
+
     # helper function
+
+    /**
+     * Check if the given list of numbers is valid
+     *
+     * @param array $rules
+     * @param int $a
+     * @param int $b
+     * @return bool
+     */
+    private function printQueue_ChkRule(array $rules, int $a, int $b): bool
+    {
+        $list_comb = $a . '|' . $b;
+        foreach ($rules as $rule) {
+            $rule_comb = $rule[0] . '|' . $rule[1];
+            if ($list_comb === $rule_comb) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Search for the string XMAS in the file
