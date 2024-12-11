@@ -3,7 +3,7 @@
 GET https://selforg.mac/aoc24/welcome
 ###
 
-# Day 1 testdata
+# Day 1 test
 GET https://selforg.mac/aoc24/day1/a/test
 ###
 
@@ -11,5 +11,11 @@ GET https://selforg.mac/aoc24/day1/a/test
 GET https://selforg.mac/aoc24/day1/a/live
 ###
 
+# Day 2 test
+GET https://selforg.mac/aoc24/day2/a/test
+###
 
+# Day 2 live
+GET https://selforg.mac/aoc24/day2/a/live
+###
 
