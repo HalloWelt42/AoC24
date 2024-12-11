@@ -36,3 +36,5 @@ Füge die folgenden Zeilen in deine `/etc/hosts`-Datei ein:
 127.0.0.1       selforg.mac
 192.168.43.103  selforg.mac
 ```
+
+jump to rest [http-test](./app/http/selforg.http)
